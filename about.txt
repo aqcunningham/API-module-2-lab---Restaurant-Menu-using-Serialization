@@ -1,0 +1,93 @@
+Created based on a lab from Meta course Meta Back-End Developer Professional Certificate from Coursera.
+
+Course APIs.
+module 2.
+
+Goal:   Using serialization, validation and deserialization techniques display API data in JSON and XML format using DRF;
+        Managers need to be able to update the inventory and price of menu items.
+
+Objectives:
+
+This app allows for viewing, creating, editing and deleting menu items;
+Converting the view into JSON, XML, YAML (through dependency installation) and viewing:
+`http://127.0.0.1:8000/api/menu-items?format=json`
+`http://127.0.0.1:8000/api/menu-items?format=xml`
+`http://127.0.0.1:8000/api/menu-items?format=csv`
+`http://127.0.0.1:8000/api/menu-items?format=yaml`
+
+
+1. Install all dependencies.
+    pip install pipenv
+    pipenv install django
+    pipenv shell
+    pipenv install
+    pipenv install djangorestframework
+    django-admin startproject littlelemonproject .
+    django-admin startapp littlelemonDRF
+    pipenv/pip install djangorestframework-xml
+    pipenv/pip install djangorestframework-csv
+    pipenv/pip install djangorestframework-yaml
+2. install renderers to be available globally in settings:
+    'rest_framework_xml.renderers.XMLRenderer',
+    'rest_framework_csv.renderers.CSVRenderer', 
+    'rest_framework_yaml.renderers.YAMLRenderer', 
+3. Add to settings:
+    INSTALLED_APPS = [
+        ...
+        'littlelemonDRF',
+        'rest_framework',
+    ]
+
+    REST_FRAMEWORK = {
+    # ENTER YOUR CODE HERE
+    'DEFAULT_RENDERER_CLASSES' : [
+    'rest_framework.renderers.JSONRenderer',
+    'rest_framework.renderers.BrowsableAPIRenderer',
+    'rest_framework_xml.renderers.XMLRenderer',
+    ]
+}
+
+4. Project urls:
+    urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/' ,include('littlelemonDRF.urls'))
+]
+
+3. Add urls in app-level urls: 
+    path('menu-items/', views.MenuItemsView.as_view()),
+    path('menu-items/<int:pk>', views.SingleMenuItemView.as_view()),
+4. Add url in project-levele urls:
+    path('api/', include('littlelemonAPI.urls')),
+5. Create models:
+    class MenuItem(models.Model):
+        title = models.CharField(max_length=255)
+        price = models.DecimalField(max_digits=6, decimal_places=2)
+        inventory = models.SmallIntegerField()
+6. After creating models, makemigrations, migrate.
+7. In serializers.py, serialize the model:
+    class MenuItemSerializer(serializers.ModelSerializer):
+        class Meta:
+            model= MenuItem
+            fields = ['id', 'title', 'price', 'inventory']
+             extra_kwargs = {
+            'price': {'min_value': 2},
+            'inventory': {'min_value': 0} // ensures proper data entry
+        }     
+8. In views.py:
+    class MenuItemsView(generics.ListCreateAPIView):
+        queryset = MenuItem.objects.all()
+        serializer_class = MenuItemSerializer
+    class SingleMenuItemView(generics.RetrieveUpdateAPIView, generics.DestroyAPIView):
+        queryset = MenuItem.objects.all()
+        serializer_class = MenuItemSerializer
+9. Save and run server.
+10. We have list of menu at:  127.0.0.1:8000/api/menu-items/
+    We can view, add items here.
+11. We have a specific menu items based on id at: 127.0.0.1:8000/api/menu-items/1
+    Here, we can edit, delete an item based on id.
+12. Additionally, we can view all items as well as specific item, all the items in JSON, XML, CSV, YAML formats by:
+    
+    127.0.0.1:8000/api/menu-items/?format=json
+    127.0.0.1:8000/api/menu-items/?format=xml
+    127.0.0.1:8000/api/menu-items/?format=csv
+    127.0.0.1:8000/api/menu-items/?format=yaml
