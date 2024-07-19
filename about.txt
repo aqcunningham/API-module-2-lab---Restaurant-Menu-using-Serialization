@@ -3,11 +3,13 @@ Created based on a lab from Meta course Meta Back-End Developer Professional Cer
 Course APIs.
 module 2.
 
+DRF -   built on top of Django, speeds up development, provides more functionality.
+        Retrieving, processing, displaying to client in JSON, serialization - key benefit of DRF.
+
 Goal:   Using serialization, validation and deserialization techniques display API data in JSON and XML format using DRF;
         Managers need to be able to update the inventory and price of menu items.
 
 Objectives:
-
 This app allows for viewing, creating, editing and deleting menu items;
 Converting the view into JSON, XML, YAML (through dependency installation) and viewing:
 `http://127.0.0.1:8000/api/menu-items?format=json`
